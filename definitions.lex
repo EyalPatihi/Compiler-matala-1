@@ -35,12 +35,15 @@ E_BULLET		/bl
 
 %%
 
-{OPENER}{STARTML}{CLOSER}		fprintf(yyout, "StartML", yytext);
-{OPENER}{NEW_LINE}{CLOSER}		fprintf(yyout, "\n",yytext);
-{OPENER}{CHAR_C}{CLOSER}		fprintf(yyout, "%20s\n",yytext);
-{OPENER}{BEGIN_HEADER}{DIGIT}	fprintf(yyout, "h"+DIGIT, yytext);		
-//{STRING}						fprintf(yyout, STRING, yytext);
-//{OPENER}{BEGIN_BOLD}{CLOSER}	
+{OPENER}{STARTML}{CLOSER}		            fprintf(yyout, "%s", yytext);
+{OPENER}{ENDML}{CLOSER}                 fprintf(yyout, "%s", yytext);
+{OPENER}{NEW_LINE}{CLOSER}	          	fprintf(yyout, "\n",yytext);
+{OPENER}{CHAR_C}{CLOSER}	            	fprintf(yyout, "%20s\n",yytext);
+{OPENER}{BEGIN_HEADER}{DIGIT}	          fprintf(yyout, "h%d", yytext);	
+{OPENER}{END_HEADER}{DIGIT}	            fprintf(yyout, "/h%d", yytext);
+//{STRING}					                   	fprintf(yyout, STRING, yytext);
+//{OPENER}{BEGIN_BOLD}{CLOSER}          fprintf(yyout, "/b", yytext);
+//{OPENER}{END_BOLD}{CLOSER}	          fprintf(yyout, "/b", yytext);
 //{OPENER}{COLOR}{CLOSER}			
 
 %%
