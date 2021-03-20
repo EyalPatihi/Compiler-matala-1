@@ -9,42 +9,54 @@ DIGIT 			[1-6]
 OPENER			<
 CLOSER			>
 
-CHAR_C			c
-CHAR_H			h
+START_CENTER		("c" | "C")
+END_CENTER      ("/c" | "/C")
 
 STARTML			oubegin
-ENDML			ouend
+ENDML			  ouend
 
 BEGIN_BOLD		bold
-END_BOLD		/bold
+END_BOLD		  /bold
 
-BEGIN_HEADER	h
-END_HEADER		/h
+BEGIN_HEADER  ("h" | "H")	
+END_HEADER    ("/h" | "/H")		
 
-NEW_LINE		nl
+NEW_LINE		("nl") | ("NL") | ("Nl") | ("nL")
 
-BEGIN_COMMENT	!! 
-END_COMMENT		 !!
+COMMENT	!! 
 
 COLOR			text color=("black" | "blue" | "red") 
 
-B_BULLET		bl
+B_BULLET		("bl") | ("BL") | ("bL") | ("Bl")
 E_BULLET		/bl
 
-//STRING			{ALPHA}+
+BEGIN_ITALICS it
+END_ITALICS   /it
+
+//STRING			({ALPHA} | (DIGIT)}+
 
 %%
 
-{OPENER}{STARTML}{CLOSER}		            fprintf(yyout, "%s", yytext);
-{OPENER}{ENDML}{CLOSER}                 fprintf(yyout, "%s", yytext);
-{OPENER}{NEW_LINE}{CLOSER}	          	fprintf(yyout, "\n",yytext);
-{OPENER}{CHAR_C}{CLOSER}	            	fprintf(yyout, "%20s\n",yytext);
-{OPENER}{BEGIN_HEADER}{DIGIT}	          fprintf(yyout, "h%d", yytext);	
-{OPENER}{END_HEADER}{DIGIT}	            fprintf(yyout, "/h%d", yytext);
+{OPENER}{STARTML}{CLOSER}		            fprintf(yyout, "startML", yytext);
+{OPENER}{ENDML}{CLOSER}                 fprintf(yyout, "endML", yytext);
+
+{OPENER}{NEW_LINE}{CLOSER}	          	fprintf(yyout, "NEWLINE",yytext);
 //{STRING}					                   	fprintf(yyout, STRING, yytext);
-//{OPENER}{BEGIN_BOLD}{CLOSER}          fprintf(yyout, "/b", yytext);
-//{OPENER}{END_BOLD}{CLOSER}	          fprintf(yyout, "/b", yytext);
+
+{OPENER}{START_CENTER}{CLOSER}	        fprintf(yyout, "START_CENTER\n",yytext);
+{OPENER}{END_CENTER}{CLOSER}	          fprintf(yyout, "END_CENTER\n",yytext);
+
+{OPENER}{BEGIN_HEADER}{DIGIT}	          fprintf(yyout, "BEGIN_HEADING_MARK" "h%c", yytext[2]);	
+{OPENER}{END_HEADER}{DIGIT}	            fprintf(yyout, "END_HEADING_MARK" "%c", yytext[2]);
+
+//{OPENER}{BEGIN_BOLD}{CLOSER}          fprintf(yyout, "BEGIN_BOLD_MARK", yytext);    ???????
+//{OPENER}{END_BOLD}{CLOSER}	          fprintf(yyout, "END_BOLD_MARK", yytext);    ???????
+
 //{OPENER}{COLOR}{CLOSER}			
+{OPENER}{BEGIN_ITALICS}{CLOSER}         //fprintf(yyout, ????????????????
+{OPENER}{END_ITALICS}{CLOSER}           //fprintf(yyout, ????????????????
+{OPENER}{COMMENT}{STRING}{COMMENT}{CLOSER}         //fprintf
+{STRING}{OPENER}
 
 %%
 
