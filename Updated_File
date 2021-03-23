@@ -9,13 +9,14 @@ DIGIT 			[1-6]
 OPENER			<
 CLOSER			>
 
-STARTML			oubegin
-ENDML			ouend
+STARTML			(?i:"oubegin")
+ENDML			(?i:"end")
 
 NEW_LINE		(?i:"nl")
 
+STRING			[^<>(!!>)]
 
-BEGIN_HEADING_MARK  (?i:"h")	
+BEGIN_HEADING_MARK  [?i:"h"]	
 END_HEADING_MARK    (?i:"/h")		
 
 START_CENTER		(?i:"c")
@@ -27,10 +28,8 @@ END_BOLD		(?i:"/bold")
 BEGIN_COMMENT	"<!!"
 END_COMMENT   	"!!>"
 
-SET_TEXT_COLOR		["text color="]((?i:""black"") | (?i:""blue"") | (?i:""red""))
-
-BEGIN_NUMBER_BULLET		(?i:"bln")   
-END_NUMBER_BULLET		(?i:"/bln")                                    
+BEGIN_NUMBER_BULLET		(?i:"bln")
+END_NUMBER_BULLET		(?i:"/bln")                                 
 
 BEGIN_REGULAR_BULLET    (?i:"bl")
 END_REGULAR_BULLET      (?i:"/bl")
@@ -40,10 +39,12 @@ END_ITALICS_MARK		(?i:"/it")
 
 %%
 
-{OPENER}{STARTML}{CLOSER}		        fprintf(yyout, "startML", yytext);
+{OPENER}{STARTML}{CLOSER}		        fprintf(yyout, "startML\n", yytext);
 {OPENER}{ENDML}{CLOSER}                 fprintf(yyout, "endML", yytext);
 
 {OPENER}{NEW_LINE}{CLOSER}	          	fprintf(yyout, "NEWLINE",yytext);
+
+{STRING}								fprintf(yyout, "STRING\n", yytext);
 
 {OPENER}{BEGIN_HEADING_MARK}{DIGIT}{CLOSER}	    fprintf(yyout, "BEGIN_HEADING_MARK", yytext);	
 {OPENER}{END_HEADING_MARK}{DIGIT}{CLOSER}	    fprintf(yyout, "END_HEADING_MARK", yytext);
@@ -63,9 +64,7 @@ END_ITALICS_MARK		(?i:"/it")
 {OPENER}{BEGIN_REGULAR_BULLET}{CLOSER}			fprintf(yyout, "BEGIN_REGULAR_BULLET", yytext);
 {OPENER}{END_REGULAR_BULLET}{CLOSER}			fprintf(yyout, "END_REGULAR_BULLET", yytext);
 
-{OPENER}{SET_TEXT_COLOR}{CLOSER}			fprintf(yyout, "SET_TEXT_COLOR", yytext);
-
-.										fprintf(yyout, "Unrecognized", yytext);
+.										fprintf(yyout, "Unrecognized character: %s\n", yytext);
 
 %%
 
