@@ -83,6 +83,7 @@ int main(int argc, char **argv ){
 		//yyout = stdout;
 		f = fopen("output.tok", "w");
 		fprintf(f,"%-15s %-15s %-15s", "TOKEN", "LEXEME", "ATTRIBUTES");
+		fclose(f);
 	}
 yylex();
 }
