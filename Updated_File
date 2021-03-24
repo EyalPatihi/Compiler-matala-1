@@ -68,17 +68,25 @@ END_ITALICS_MARK		(?i:"/it")
 
 %%
 
-int main(int argc, char **argv ){
-++argv, --argc;  /* skip over program name */
-if ( argc > 0 )
-yyin = fopen( argv[0], "r" );
-else
-yyin = stdin;
+int main(int argc, char **argv) {
+	FILE *f;
+	char t[200], l[200], a[200];
+	++argv, --argc;  /* skip over program name */
+	if (argc > 0)
+		yyin = fopen(argv[0], "r");
+	else {
+		yyin = stdin;
+		yyin = fopen("input.ouml", "r");
+	}
 
+	if (argc > 1)
+		f = fopen(argv[1], "w");
+	else {
+		f = fopen("output.tok", "w");
+		fprintf(f, "%-10s%-13s%s\n", "TOKEN", "LEXEME", "ATTRIBUTES");
+		fclose(f);
 
-if ( argc > 1 )
-yyout = fopen( argv[1], "w" );
-else
-yyout = stdout;
-yylex();
+		yyout = stdout;
+	}
+	yylex();
 }
