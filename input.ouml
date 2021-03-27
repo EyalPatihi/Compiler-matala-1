@@ -1,0 +1,88 @@
+%option noyywrap
+
+%{
+FILE *f;
+%}
+
+ALPHA 			[A-Za-z]
+DIGIT 			[1-6]
+
+OPENER			<
+CLOSER			>
+
+STARTML			(?i:"oubegin")
+ENDML			(?i:"ouend")
+
+NEW_LINE		(?i:"nl")
+
+STRING			(^<>(!!>))
+
+BEGIN_HEADING_MARK  [?i:"h"]	
+END_HEADING_MARK    (?i:"/h")		
+
+START_CENTER		(?i:"c")
+END_CENTER			(?i:"/c")
+
+BEGIN_BOLD		(?i:"bold")    
+END_BOLD		(?i:"/bold")                      
+
+BEGIN_COMMENT	"<!!"
+END_COMMENT   	"!!>"
+
+BEGIN_NUMBER_BULLET		(?i:"bln")
+END_NUMBER_BULLET		(?i:"/bln")                                 
+
+BEGIN_REGULAR_BULLET    (?i:"bl")
+END_REGULAR_BULLET      (?i:"/bl")
+
+BEGIN_ITALICS_MARK		(?i:"it")
+END_ITALICS_MARK		(?i:"/it")
+
+%%
+
+{OPENER}{STARTML}{CLOSER}		        fprintf(yyout, "startML\n", yytext);fprintf(f, "startML %30s\n", yytext);
+{OPENER}{ENDML}{CLOSER}                 fprintf(yyout, "endML\n", yytext);fprintf(f, "endML %30s\n", yytext);
+
+{OPENER}{NEW_LINE}{CLOSER}	          	fprintf(yyout, "NEWLINE",yytext);
+
+{STRING}								fprintf(yyout, "STRING\n", yytext);
+
+{OPENER}{BEGIN_HEADING_MARK}{DIGIT}{CLOSER}	    fprintf(yyout, "BEGIN_HEADING_MARK\n", yytext);fprintf(f, "BEGIN_HEADING_MARK %30s\t", yytext);	
+{OPENER}{END_HEADING_MARK}{DIGIT}{CLOSER}	    fprintf(yyout, "END_HEADING_MARK\n", yytext);fprintf(f, "END_HEADING_MARK %30s\t", yytext);
+
+{OPENER}{START_CENTER}{CLOSER}			fprintf(yyout, "START_CENTER\n", yytext);fprintf(f, "START_CENTER %30s\n", yytext);
+{OPENER}{END_CENTER}{CLOSER}			fprintf(yyout, "END_CENTER\n", yytext);fprintf(f, "END_CENTER %30s\n", yytext);
+
+{OPENER}{BEGIN_BOLD}{CLOSER}			fprintf(yyout, "BEGIN_BOLD\n", yytext);fprintf(f, "BEGIN_BOLD %30s\n", yytext);
+{OPENER}{END_BOLD}{CLOSER}				fprintf(yyout, "END_BOLD\n", yytext);fprintf(f, "END_BOLD %30s\n", yytext);
+
+{OPENER}{BEGIN_ITALICS_MARK}{CLOSER}	fprintf(yyout, "BEGIN_ITALICS_MARK\n", yytext);fprintf(f, "BEGIN_ITALICS_MARK %30s\n", yytext);
+{OPENER}{END_ITALICS_MARK}{CLOSER}		fprintf(yyout, "END_ITALICS_MARK\n", yytext);fprintf(f, "END_ITALICS_MARK %30s\n", yytext);
+
+{OPENER}{BEGIN_NUMBER_BULLET}{CLOSER}	fprintf(yyout, "BEGIN_NUMBER_BULLET\n", yytext);fprintf(f, "BEGIN_NUMBER_BULLET %30s\n", yytext);
+{OPENER}{END_NUMBER_BULLET}{CLOSER}		fprintf(yyout, "END_NUMBER_BULLET\n", yytext);fprintf(f, "END_NUMBER_BULLET %30s\n", yytext);
+
+{OPENER}{BEGIN_REGULAR_BULLET}{CLOSER}			fprintf(yyout, "BEGIN_REGULAR_BULLET\n", yytext);fprintf(f, "BEGIN_REGULAR_BULLET %30s\n", yytext);
+{OPENER}{END_REGULAR_BULLET}{CLOSER}			fprintf(yyout, "END_REGULAR_BULLET\n", yytext);fprintf(f, "END_REGULAR_BULLET %30s\n", yytext);
+
+.										fprintf(yyout, "Unrecognized character: %s\n", yytext);
+
+%%
+
+int main(int argc, char **argv ){
+
+	++argv, --argc;  /* skip over program name */
+	f = fopen("output.tok", "w");	
+	if ( argc > 0 )
+		yyin = fopen( argv[0], "r" );
+	else
+		yyin = stdin;
+
+	if ( argc > 1 )
+		f = fopen( argv[1], "w" );
+	else{
+		yyout = stdout;
+		fprintf(f, "%-30s %-30s %-30s", "TOKEN", "LEXEME", "ATTRIBUTES");
+	}
+yylex();
+}
