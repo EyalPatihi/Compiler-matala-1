@@ -68,8 +68,7 @@ END_ITALICS_MARK		(?i:"/it")
 {OPENER}{BEGIN_REGULAR_BULLET}{CLOSER}			fprintf(yyout, "begin_regular_bullet\n", yytext);fprintf(f, "begin_regular_bullet \t%s\n", yytext);
 {OPENER}{END_REGULAR_BULLET}{CLOSER}			fprintf(yyout, "end_regular_bullet\n", yytext);fprintf(f, "end_regular_bullet \t%s\n", yytext);
 
-.										fprintf(yyout, "Unrecognized character: %s\n", yytext);
-
+{string}						 fprintf(yyout, "string\n", yytext);fprintf(f, "string= \t%s\n", yytext);
 %%
 
 int main(int argc, char **argv ){
