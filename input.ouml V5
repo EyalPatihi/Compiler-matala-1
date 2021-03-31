@@ -6,6 +6,7 @@ FILE *f;
 
 ALPHA 			[A-Za-z]
 DIGIT 			[1-6]
+QUOTATION_MARKS	.
 
 OPENER			<
 CLOSER			>
@@ -16,6 +17,9 @@ ENDML			(?i:"ouend")
 NEW_LINE		(?i:"nl")
 
 STRING			(^<>(!!>))
+
+TEXT_COLOR		("text color=")
+COLOR			((?i:"red")|(?i:"blue")|(?i:"black"))
 
 BEGIN_HEADING_MARK  (?i:"h")
 END_HEADING_MARK    (?i:"/h")		
@@ -43,10 +47,14 @@ END_ITALICS_MARK		(?i:"/it")
 {OPENER}{STARTML}{CLOSER}		        fprintf(yyout, "startML\n", yytext);fprintf(f, "startML \t%s\n", yytext);
 {OPENER}{ENDML}{CLOSER}                 fprintf(yyout, "endML\n", yytext);fprintf(f, "endML \t%s\n", yytext);
 
-{OPENER}{NEW_LINE}{CLOSER}	          	fprintf(yyout, "newline\n",yytext);fprintf(f, "newline \t\t%s\n", yytext);
+{OPENER}{NEW_LINE}{CLOSER}	          	fprintf(yyout, "newline\n",yytext);fprintf(f, "newline \t\t%s\n", yytext); 
+
+{STRING}*								fprintf(yyout, "string\n",yytext);fprintf(f, "string \t%s\n", yytext);
+
+{OPENER}{TEXT_COLOR}{COLOR}{CLOSER}		fprintf(yyout, "set_text_color\n", yytext);fprintf(f, "set_text_color \t %s \t	Color \n", yytext); 
 
 {OPENER}{BEGIN_HEADING_MARK}{DIGIT}{CLOSER}	    fprintf(yyout, "begin_heading_mark\n", yytext);fprintf(f, "begin_heading_mark \t%s \t Size %c\n", yytext, yytext[2]);	
-{OPENER}{END_HEADING_MARK}{DIGIT}{CLOSER}	    fprintf(yyout, "end_heading_mark\n", yytext);fprintf(f, "end_heading_mark \t%s\n", yytext);
+{OPENER}{END_HEADING_MARK}{DIGIT}{CLOSER}	    fprintf(yyout, "end_heading_mark\n", yytext);fprintf(f, "end_heading_mark \t%s \t Size %c\n", yytext, yytext[3]);
 
 {OPENER}{START_CENTER}{CLOSER}			fprintf(yyout, "start_center\n", yytext);fprintf(f, "start_center \t%s\n", yytext);
 {OPENER}{END_CENTER}{CLOSER}			fprintf(yyout, "end_center\n", yytext);fprintf(f, "end_center \t%s\n", yytext);
@@ -65,8 +73,6 @@ END_ITALICS_MARK		(?i:"/it")
 
 {OPENER}{BEGIN_REGULAR_BULLET}{CLOSER}			fprintf(yyout, "begin_regular_bullet\n", yytext);fprintf(f, "begin_regular_bullet \t%s\n", yytext);
 {OPENER}{END_REGULAR_BULLET}{CLOSER}			fprintf(yyout, "end_regular_bullet\n", yytext);fprintf(f, "end_regular_bullet \t%s\n", yytext);
-
-{STRING}*								fprintf(yyout, "string\n",yytext);fprintf(f, "string \t%s\n", yytext);
 
 {OPENER}{STRING}						fprintf(yyout, "Unrecognized character: %s\n", yytext);
 
