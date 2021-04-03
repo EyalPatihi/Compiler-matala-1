@@ -6,7 +6,6 @@ FILE *f;
 
 ALPHA 			[A-Za-z]
 DIGIT 			[1-6]
-QUOTATION_MARKS	.
 
 OPENER			<
 CLOSER			>
@@ -18,7 +17,7 @@ NEW_LINE		(?i:"nl")
 
 STRING			(^<>(!!>))
 
-TEXT_COLOR		("text color=")
+TEXT_COLOR		(?i:"text color=")
 COLOR			((?i:"red")|(?i:"blue")|(?i:"black"))
 
 BEGIN_HEADING_MARK  (?i:"h")
@@ -51,7 +50,7 @@ END_ITALICS_MARK		(?i:"/it")
 
 {STRING}*								fprintf(yyout, "string\n",yytext);fprintf(f, "string \t%s\n", yytext);
 
-{OPENER}{TEXT_COLOR}{COLOR}{CLOSER}		fprintf(yyout, "set_text_color\n", yytext);fprintf(f, "set_text_color \t %s \t	Color \n", yytext); 
+{OPENER}{TEXT_COLOR}{COLOR}{CLOSER}		fprintf(yyout, "set_text_color\n", yytext);fprintf(f, "set_text_color \t %s \t	Color %.5c\n", yytext, yytext[12]);
 
 {OPENER}{BEGIN_HEADING_MARK}{DIGIT}{CLOSER}	    fprintf(yyout, "begin_heading_mark\n", yytext);fprintf(f, "begin_heading_mark \t%s \t Size %c\n", yytext, yytext[2]);	
 {OPENER}{END_HEADING_MARK}{DIGIT}{CLOSER}	    fprintf(yyout, "end_heading_mark\n", yytext);fprintf(f, "end_heading_mark \t%s \t Size %c\n", yytext, yytext[3]);
@@ -75,6 +74,7 @@ END_ITALICS_MARK		(?i:"/it")
 {OPENER}{END_REGULAR_BULLET}{CLOSER}			fprintf(yyout, "end_regular_bullet\n", yytext);fprintf(f, "end_regular_bullet \t%s\n", yytext);
 
 {OPENER}{STRING}						fprintf(yyout, "Unrecognized character: %s\n", yytext);
+
 
 %%
 
