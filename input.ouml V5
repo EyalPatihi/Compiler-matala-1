@@ -15,7 +15,7 @@ ENDML			(?i:"ouend")
 
 NEW_LINE		(?i:"nl")
 
-STRING			(^<>(!!>))
+STRING			(^(<>))
 
 TEXT_COLOR		(?i:"text color=")
 COLOR			((?i:"red")|(?i:"blue")|(?i:"black"))
@@ -73,7 +73,11 @@ END_ITALICS_MARK		(?i:"/it")
 {OPENER}{BEGIN_REGULAR_BULLET}{CLOSER}			fprintf(yyout, "begin_regular_bullet\n", yytext);fprintf(f, "begin_regular_bullet \t%s\n", yytext);
 {OPENER}{END_REGULAR_BULLET}{CLOSER}			fprintf(yyout, "end_regular_bullet\n", yytext);fprintf(f, "end_regular_bullet \t%s\n", yytext);
 
-{OPENER}{STRING}						fprintf(yyout, "Unrecognized character: %s\n", yytext);
+{OPENER}								fprintf(yyout, "Unrecognized char: %s\n", yytext);
+{CLOSER}								fprintf(yyout, "Unrecognized char: %s\n", yytext);
+
+.										fprintf(yyout, "string %s\n", yytext); fprintf(f, "string %s\n", yytext);
+
 
 
 %%
